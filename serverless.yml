@@ -31,6 +31,22 @@ functions:
       FUNCTION: create-deck
       REGION: ${self:provider.region}
       STAGE: ${self:provider.stage}
+  update-balance:
+      handler: functions/update-balance.lambda
+      description: Update the profile balance by a specified *amount* that can be both positive or negative
+      events:
+        - http:
+            path: profile-balance
+            method: post
+            authorizer:
+              arn: arn:aws:cognito-idp:us-east-1:944018887059:userpool/us-east-1_iNwEq6E3v
+      role: arn:aws:iam::944018887059:role/SP_Profile_Lambda
+      tags:
+        FUNCTION: update-balance
+      environment:
+        FUNCTION: update-balance
+        REGION: ${self:provider.region}
+        STAGE: ${self:provider.stage}
 resources:
   Resources:
     DecksTable:
@@ -42,6 +58,19 @@ resources:
             AttributeType: S
         KeySchema:
           - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    ProfileBalancesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: SP-Profile-Balances-${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: profileId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: profileId
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
