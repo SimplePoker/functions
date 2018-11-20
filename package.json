@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "sls deploy",
-    "staging": "sls deploy --stage staging",
+    "staging": "sls deploy --stage staging --region eu-west-2",
     "prod": "sls deploy --stage production"
   },
   "author": "Oskar Kaminski",
@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "aws-sdk": "^2.348.0",
+    "serverless": "^1.33.2",
     "serverless-plugin-include-dependencies": "^3.1.1",
     "serverless-pseudo-parameters": "^2.2.0"
   }

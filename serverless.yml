@@ -8,7 +8,6 @@ provider:
   name: aws
   runtime: nodejs8.10
   region: ${opt:region, 'eu-west-2'}
-  profile: default
   memorySize: 128
   tags:
     PROJECT: "Simple Poker"

@@ -1,0 +1,9 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:8-jessie-browsers
+    steps:
+      - checkout
+      - run: npm i
+      - run: npm run staging
