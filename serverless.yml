@@ -1,0 +1,49 @@
+service: SimplePoker-functions
+frameworkVersion: ">=1.32.0 < 2.0.0"
+plugins:
+  - serverless-pseudo-parameters
+  - serverless-plugin-include-dependencies
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  region: ${opt:region, 'eu-west-2'}
+  profile: default
+  memorySize: 128
+  tags:
+    PROJECT: "Simple Poker"
+    REGION: ${self:provider.region}
+  stage: ${opt:stage, 'dev'}
+package:
+  exclude:
+    - package.json
+    - package-lock.json
+
+functions:
+  create-deck:
+    handler: functions/create-deck.lambda
+    description: Returns new, shuffled deck of cards with *color* and *value* properites
+    events:
+      - http:
+          path: deck
+          method: post
+    role: arn:aws:iam::944018887059:role/SP_Deck_Lambda
+    environment:
+      FUNCTION: create-deck
+      REGION: ${self:provider.region}
+      STAGE: ${self:provider.stage}
+resources:
+  Resources:
+    DecksTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: SP-Decks-${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1

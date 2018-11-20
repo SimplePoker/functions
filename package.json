@@ -1,0 +1,22 @@
+{
+  "name": "deck",
+  "version": "1.0.0",
+  "description": "",
+  "main": "deck.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "sls deploy",
+    "staging": "sls deploy --stage staging",
+    "prod": "sls deploy --stage production"
+  },
+  "author": "Oskar Kaminski",
+  "license": "ISC",
+  "dependencies": {
+    "lodash.flatmap": "^4.5.0"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.348.0",
+    "serverless-plugin-include-dependencies": "^3.1.1",
+    "serverless-pseudo-parameters": "^2.2.0"
+  }
+}
