@@ -14,14 +14,21 @@ module.exports.lambda = async (event, context) => {
         bet: 0
     }))
 
-    const dealer = await getDealer(table)
+    const dealerSeat = await getDealer(table)
+    const smallBlindSeat = getNextSeat(dealerSeat, players)
+    const bigBlindSeat = getNextSeat(smallBlindSeat, players)
+    const currentSeat = getNextSeat(bigBlindSeat, players)
+
     await updateDeck(deckId, cards)
 
     const game = {
         id: uuid(),
         deckId,
         stake: table.stake,
-        dealer,
+        dealerSeat,
+        smallBlindSeat,
+        bigBlindSeat,
+        currentSeat,
         players,
         phase: 0,
         tableCards: [],
@@ -30,7 +37,8 @@ module.exports.lambda = async (event, context) => {
             total: 0
         }
     }
-    return createGame(game)
+    await createGame(game)
+    return setTableCurrentGame(tableId, game.id)
 };
 
 // Database
@@ -47,6 +55,21 @@ async function updateDeck(deckId, cards){
         ReturnValues: 'ALL_NEW'
     }
     return (await db.update(profileUpdateQuery).promise()).Attributes
+}
+
+async function setTableCurrentGame(tableId, gameId){
+    const tableUpdateQuery = {
+        TableName : `SP-Tables-${process.env.STAGE}`,
+        Key: {id: tableId},
+        AttributeUpdates: {
+            currentGameId: {
+                Action: 'PUT',
+                Value: gameId
+            }
+        },
+        ReturnValues: 'ALL_NEW'
+    }
+    return (await db.update(tableUpdateQuery).promise()).Attributes
 }
 
 async function createGame(game){
@@ -83,16 +106,17 @@ function pullCardsFn(cards){
     return [spliceCard(cards), spliceCard(cards)]
 }
 
-function nextSeat(seats, previousSeat) {
-    return seats.find(n => n > previousSeat) || Math.min(...seats)
-}
-
 async function getDealer(table){
     if(table.previousGameId){
         const {dealer: previousDealer} = await getTable(table.previousGameId)
-        const seats = table.players.map(p => p.seat)
-        return nextSeat(seats, previousDealer)
+        return getNextSeat(previousDealer, table.players)
     } else {
         return table.players[0] && table.players[0].seat || null
     }
+}
+
+// Takes current seat and list of players
+function getNextSeat(seat, players) {
+    const seats = players.map(p => p.seat).sort()
+    return seats.find(n => n > seat) || Math.min(...seats)
 }
