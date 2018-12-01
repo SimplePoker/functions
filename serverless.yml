@@ -31,22 +31,38 @@ functions:
       FUNCTION: create-deck
       REGION: ${self:provider.region}
       STAGE: ${self:provider.stage}
-  update-balance:
-      handler: functions/update-balance.lambda
-      description: Update the profile balance by a specified *amount* that can be both positive or negative
-      events:
-        - http:
-            path: profile-balance
-            method: post
-            authorizer:
-              arn: arn:aws:cognito-idp:us-east-1:944018887059:userpool/us-east-1_iNwEq6E3v
-      role: arn:aws:iam::944018887059:role/SP_Profile_Lambda
-      tags:
-        FUNCTION: update-balance
-      environment:
-        FUNCTION: update-balance
-        REGION: ${self:provider.region}
-        STAGE: ${self:provider.stage}
+  create-table:
+    handler: functions/create-table.lambda
+    description: Creates new table for play
+    role: arn:aws:iam::944018887059:role/SP_Lambda
+    environment:
+      FUNCTION: create-table
+      REGION: ${self:provider.region}
+      STAGE: ${self:provider.stage}
+  create-profile:
+    handler: functions/create-profile.lambda
+    description: Creates new profile
+    role: arn:aws:iam::944018887059:role/SP_Lambda
+    environment:
+      FUNCTION: create-profile
+      REGION: ${self:provider.region}
+      STAGE: ${self:provider.stage}
+  player-join-table:
+    handler: functions/player-join-table.lambda
+    description: Profile joining the table
+    role: arn:aws:iam::944018887059:role/SP_Lambda
+    environment:
+      FUNCTION: player-join-table
+      REGION: ${self:provider.region}
+      STAGE: ${self:provider.stage}
+  create-game:
+    handler: functions/create-game.lambda
+    description: Create a new game
+    role: arn:aws:iam::944018887059:role/SP_Lambda
+    environment:
+      FUNCTION: create-game
+      REGION: ${self:provider.region}
+      STAGE: ${self:provider.stage}
 resources:
   Resources:
     DecksTable:
@@ -59,19 +75,37 @@ resources:
         KeySchema:
           - AttributeName: id
             KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-    ProfileBalancesTable:
+        BillingMode: PAY_PER_REQUEST
+    TablesTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: SP-Profile-Balances-${self:provider.stage}
+        TableName: SP-Tables-${self:provider.stage}
         AttributeDefinitions:
-          - AttributeName: profileId
+          - AttributeName: id
             AttributeType: S
         KeySchema:
-          - AttributeName: profileId
+          - AttributeName: id
             KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+        BillingMode: PAY_PER_REQUEST
+    ProfilesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: SP-Profiles-${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+    GamesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: SP-Games-${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
