@@ -63,6 +63,38 @@ functions:
       FUNCTION: create-game
       REGION: ${self:provider.region}
       STAGE: ${self:provider.stage}
+  player-fold:
+    handler: functions/player-fold.lambda
+    description: Handling player FOLD
+    role: arn:aws:iam::944018887059:role/SP_Lambda
+    environment:
+      FUNCTION: player-fold
+      REGION: ${self:provider.region}
+      STAGE: ${self:provider.stage}
+  player-bet:
+    handler: functions/player-bet.lambda
+    description: Handling player BET
+    role: arn:aws:iam::944018887059:role/SP_Lambda
+    environment:
+      FUNCTION: player-bet
+      REGION: ${self:provider.region}
+      STAGE: ${self:provider.stage}
+  player-call:
+    handler: functions/player-call.lambda
+    description: Handling player CALL
+    role: arn:aws:iam::944018887059:role/SP_Lambda
+    environment:
+      FUNCTION: player-call
+      REGION: ${self:provider.region}
+      STAGE: ${self:provider.stage}
+  player-check:
+    handler: functions/player-check.lambda
+    description: Handling player CHECK
+    role: arn:aws:iam::944018887059:role/SP_Lambda
+    environment:
+      FUNCTION: player-check
+      REGION: ${self:provider.region}
+      STAGE: ${self:provider.stage}
 resources:
   Resources:
     DecksTable:
